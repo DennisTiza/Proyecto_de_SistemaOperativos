@@ -12,9 +12,19 @@ class Login:
     def __init__(self):
         # Creacion de la ventana principal
         self.root = ctk.CTk()
-        self.root.geometry("1050x640")
         self.root.title("Sistema Operativo Dx")
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        # Establece la geometría para ocupar toda la pantalla
+        self.root.geometry(f"{screen_width}x{screen_height-60}")
+        imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "monterey.png")),size=(screen_width,screen_height))
+        background = ctk.CTkLabel(master=self.root, image = imagen, text="")
+        background.place(x = 0, y = 0)
         #self.root.iconbitmap("img/icon.ico")
+
+        # Banner
+        banner = ctk.CTkLabel(master=self.root, text="", width=400, height=640, corner_radius=100)
+        banner.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
         
         # Contenido de la ventana principal
         # logo
@@ -24,12 +34,12 @@ class Login:
             size=(250,250))
         
         # Etiqueta para mostrar el logo
-        etiqueta = ctk.CTkLabel(master=self.root, image=logo, text="")
-        etiqueta.pack(pady = 15)
+        etiqueta = ctk.CTkLabel(master=self.root, image=logo, text="", anchor="center")
+        etiqueta.pack(pady=55)
 
         #Campos de texto
         #Usuario
-        ctk.CTkLabel(self.root, text="Usuario").pack()
+        ctk.CTkLabel(self.root, text="Usuario", fg_color="transparent").pack()
         self.usuario = ctk.CTkEntry(self.root)
         self.usuario.insert(0, "Usuario")
         self.usuario.bind("<Button-1>", lambda e: self.usuario.delete(0, 'end'))
@@ -84,7 +94,7 @@ class VentanaPrincipal:
         screen_height = self.root.winfo_screenheight()
 
         # Establece la geometría para ocupar toda la pantalla
-        self.root.geometry(f"{screen_width}x{screen_height}+0+0")
+        self.root.geometry(f"{screen_width}x{screen_height-60}")
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "iridescence.png")),size=(screen_width,screen_height))
         background = ctk.CTkLabel(master=self.root, image = imagen, text="")
         background.place(x = 0, y = 0)

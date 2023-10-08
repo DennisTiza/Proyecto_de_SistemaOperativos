@@ -19,8 +19,7 @@ class Login:
         self.root.title("Sistema Operativo Dx")
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
-        # Establece la geometría para ocupar toda la pantalla
-        self.root.geometry(f"{screen_width}x{screen_height-60}")
+        self.root.attributes('-fullscreen', True)
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "monterey.png")),size=(screen_width,screen_height))
         background = ctk.CTkLabel(master=self.root, image = imagen, text="")
         background.place(x = 0, y = 0)
@@ -37,46 +36,46 @@ class Login:
             dark_image= Image.open(os.path.join("Imagenes", "DX.png")),
             size=(250,250))
         
+        # Frame para el logo y el texto
+        tifo = ctk.CTkFrame(master=self.root, corner_radius=40)
+        tifo.place(relx=0.5, rely=0.49, anchor=ctk.CENTER)
+        
         # Etiqueta para mostrar el logo
-        etiqueta = ctk.CTkLabel(master=self.root, image=logo, text="", anchor="center")
-        etiqueta.pack(pady=55)
+        etiqueta = ctk.CTkLabel(master=tifo, image=logo, text="", anchor=ctk.CENTER)
+        etiqueta.pack(pady=30, padx=30)
 
         #Campos de texto
         #Usuario
-        ctk.CTkLabel(self.root, text="Usuario", fg_color="transparent").pack()
-        self.usuario = ctk.CTkEntry(self.root)
+        ctk.CTkLabel(tifo, text="Usuario", fg_color="transparent").pack()
+        self.usuario = ctk.CTkEntry(tifo)
         self.usuario.insert(0, "Usuario")
         self.usuario.bind("<Button-1>", lambda e: self.usuario.delete(0, 'end'))
         self.usuario.pack()
 
 
         # Contraseña
-        ctk.CTkLabel(self.root, text="Contraseña").pack()
-        self.contrase = ctk.CTkEntry(self.root)
+        ctk.CTkLabel(tifo, text="Contraseña").pack()
+        self.contrase = ctk.CTkEntry(tifo)
         self.contrase.insert(0, "*******")
         self.contrase.bind("<Button-1>", lambda e: self.contrase.delete(0, 'end'))
         self.contrase.pack()
-
+        self.info_login = ctk.CTkLabel(tifo, text="")
         #Boton de inicio de sesion
-        ctk.CTkButton(self.root, text="Entrar", command=self.validar).pack(pady=10)
-
+        ctk.CTkButton(tifo, text="Entrar", command=lambda: self.validar(self.info_login)).pack(pady=10)
+        self.info_login.pack(pady=10)
         # Bucle de ejecucion
         self.root.mainloop()
 
 
         # Función para validar el login
-    def validar(self):
+    def validar(self, login):
         obtener_usuario = self.usuario.get() # Obtenemos el nombre de usuario
         obtener_contrasena = self.contrase.get() # Obtenemos la contraseña
         for user in user_db.users:
         # Verifica si el valor que tiene el usuario o la contraseña o ambos no coinciden
             if obtener_usuario != user.username or obtener_contrasena != user.password:
-                # En caso de tener ya un elemento "info_login" (etiqueta) creado, lo borra
-                if hasattr(self, "info_login"):
-                    self.info_login.destroy()
                 # Crea esta etiqueta siempre que el login sea incorrecto
-                self.info_login = ctk.CTkLabel(self.root, text="Usuario o contraseña incorrectos.")
-                self.info_login.pack()
+                self.info_login.configure(text="Usuario o contraseña incorrectos")
             else:
                 # En caso de tener ya un elemento "info_login" (etiqueta) creado, lo borra
                 if hasattr(self, "info_login"):
@@ -95,17 +94,63 @@ class VentanaPrincipal:
     def __init__(self):
         self.root = ctk.CTk()
         self.root.title("Supra Os")
+        self.root.attributes('-fullscreen', True)
         screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
+        screen_height = self.root.winfo_screenheight()        
 
         # Establece la geometría para ocupar toda la pantalla
         self.root.geometry(f"{screen_width}x{screen_height-60}")
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "iridescence.png")),size=(screen_width,screen_height))
         background = ctk.CTkLabel(master=self.root, image = imagen, text="")
         background.place(x = 0, y = 0)
+
+        # CREACION DE LA BARRA DE MENU
+        barra = ctk.CTkLabel(master=self.root, text="", width= screen_width, height=100,  fg_color=("steel blue", "midnight blue"),corner_radius=8)
+        barra.place(relx=0.5, rely=1, anchor=ctk.CENTER)
+
         listen_thread = threading.Thread(target=ReconocimientoVoz)
         listen_thread.start()
+        reloj_thread = threading.Thread(target=Reloj, args=(self.root,))
+        reloj_thread.start()
         self.root.mainloop()
+
+class Reloj:
+    def __init__(self, ventana):
+        # Configura las etiquetas para mostrar la hora, el día y la fecha
+        self.texto_hora = ctk.CTkLabel(master=ventana, fg_color=("white", "midnight blue"), font=('Radioland', 14, 'bold'))
+        self.texto_hora.place(relx=0.97, rely=0.957, anchor=ctk.CENTER)
+
+        self.texto_fecha = ctk.CTkLabel(master=ventana, fg_color=("midnight blue", "midnight blue"), font=('Radioland', 14, 'bold'))
+        self.texto_fecha.place(relx=0.97, rely=0.984, anchor=ctk.CENTER)
+
+        self.actualizar_tiempo()
+
+    def actualizar_tiempo(self):
+        # Obtén la hora actual en formato 12 horas con 'am' o 'pm'
+        hora = strftime('%I:%M %p')
+
+        # Traducción de los nombres de los días a español
+        dias = {
+            'Monday': 'Lunes',
+            'Tuesday': 'Martes',
+            'Wednesday': 'Miércoles',
+            'Thursday': 'Jueves',
+            'Friday': 'Viernes',
+            'Saturday': 'Sábado',
+            'Sunday': 'Domingo'
+        }
+        dia = strftime('%A')
+        dia_traducido = dias.get(dia, dia)
+
+        # Obtén la fecha actual
+        fecha = strftime('%d/%m/%y')
+
+        self.texto_hora.configure(text=hora)
+        self.texto_fecha.configure(text=fecha)
+
+        # Programa la actualización periódica cada 1000 ms (1 segundo)
+        self.texto_hora.after(1000, self.actualizar_tiempo)
+
 
 # Class para el reconocimiento de voz   
 class ReconocimientoVoz:

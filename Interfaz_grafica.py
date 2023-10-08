@@ -3,6 +3,10 @@ import customtkinter as ctk
 import os
 from PIL import Image, ImageTk
 from base_datos import UserDatabase
+import speech_recognition as sr
+import keyboard
+import threading
+from time import strftime
 # Configuraciones Globales modo color y tema
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
@@ -45,6 +49,7 @@ class Login:
         self.usuario.bind("<Button-1>", lambda e: self.usuario.delete(0, 'end'))
         self.usuario.pack()
 
+
         # Contraseña
         ctk.CTkLabel(self.root, text="Contraseña").pack()
         self.contrase = ctk.CTkEntry(self.root)
@@ -58,7 +63,7 @@ class Login:
         # Bucle de ejecucion
         self.root.mainloop()
 
-    
+
         # Función para validar el login
     def validar(self):
         obtener_usuario = self.usuario.get() # Obtenemos el nombre de usuario
@@ -89,7 +94,7 @@ class Login:
 class VentanaPrincipal:
     def __init__(self):
         self.root = ctk.CTk()
-        self.root.title("Sistema Operativo Dx")
+        self.root.title("Supra Os")
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
 
@@ -98,4 +103,40 @@ class VentanaPrincipal:
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "iridescence.png")),size=(screen_width,screen_height))
         background = ctk.CTkLabel(master=self.root, image = imagen, text="")
         background.place(x = 0, y = 0)
+        listen_thread = threading.Thread(target=ReconocimientoVoz)
+        listen_thread.start()
         self.root.mainloop()
+
+# Class para el reconocimiento de voz   
+class ReconocimientoVoz:
+    def __init__(self):
+        self.recognizer = sr.Recognizer() 
+        hilo = threading.Thread(target=self.start_keyboard_hook)
+        hilo.start()   
+
+        # Función para iniciar el reconocimiento de voz
+    def start_listening(self):
+        with sr.Microphone() as source:
+            print("Escuchando... Presiona Ctrl+M nuevamente para detener.")
+            audio = self.recognizer.listen(source)
+        
+        try:
+            text = self.recognizer.recognize_google(audio)
+            print("Has dicho: {}".format(text))
+            if text == 'open system':
+                print("Abriendo sistema")
+        except sr.UnknownValueError:
+            print("No se pudo entender lo que dijiste")
+        except sr.RequestError as e:
+            print("Error en la solicitud a Google Speech Recognition; {0}".format(e))
+
+    def start_keyboard_hook(self):
+        keyboard.hook(self.on_key_event)
+        keyboard.wait('esc')
+        
+            # Función que se ejecutará cuando se presione una tecla
+    def on_key_event(self, keyboard_event):
+        if keyboard_event.event_type == keyboard.KEY_DOWN and keyboard_event.name == 'm':
+            if keyboard.is_pressed('ctrl'):
+                print("Presionaste Ctrl+M")
+                self.start_listening()

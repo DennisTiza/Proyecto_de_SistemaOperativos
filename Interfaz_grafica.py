@@ -6,6 +6,7 @@ from base_datos import UserDatabase
 import speech_recognition as sr
 import keyboard
 import threading
+import psutil
 from time import strftime
 # Configuraciones Globales modo color y tema
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -112,6 +113,8 @@ class VentanaPrincipal:
         listen_thread.start()
         reloj_thread = threading.Thread(target=Reloj, args=(self.root,))
         reloj_thread.start()
+        bateria_thread = threading.Thread(target=BateriaEstado, args=(self.root,))
+        bateria_thread.start()
         self.root.mainloop()
 
 class Reloj:
@@ -151,6 +154,18 @@ class Reloj:
         # Programa la actualización periódica cada 1000 ms (1 segundo)
         self.texto_hora.after(1000, self.actualizar_tiempo)
 
+class BateriaEstado:
+    def __init__(self, ventana):
+        self.texto_bateria = ctk.CTkLabel(master=ventana, fg_color=("white", "midnight blue"), font=('Radioland', 14, 'bold'))
+        self.texto_bateria.place(relx=0.90, rely=0.966, anchor=ctk.CENTER)
+        self.update_battery_status()
+
+    def update_battery_status(self):
+        battery = psutil.sensors_battery()
+        percent = battery.percent if battery else "Desconocido"
+        charging_status = "+" if battery.power_plugged else ""
+        self.texto_bateria.configure(text=f"Bateria: {charging_status}{percent}%")
+        self.texto_bateria.after(1000, self.update_battery_status)  # Actualiza cada segundo
 
 # Class para el reconocimiento de voz   
 class ReconocimientoVoz:

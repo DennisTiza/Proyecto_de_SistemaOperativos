@@ -7,6 +7,7 @@ import speech_recognition as sr
 import keyboard
 import threading
 import psutil
+import wmi
 from time import strftime
 # Configuraciones Globales modo color y tema
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -56,7 +57,7 @@ class Login:
 
         # Contraseña
         ctk.CTkLabel(tifo, text="Contraseña").pack()
-        self.contrase = ctk.CTkEntry(tifo)
+        self.contrase = ctk.CTkEntry(tifo, show="*")
         self.contrase.insert(0, "*******")
         self.contrase.bind("<Button-1>", lambda e: self.contrase.delete(0, 'end'))
         self.contrase.pack()
@@ -115,6 +116,8 @@ class VentanaPrincipal:
         reloj_thread.start()
         bateria_thread = threading.Thread(target=BateriaEstado, args=(self.root,))
         bateria_thread.start()
+        wifi_thread = threading.Thread(target=WiFiEstado, args=(self.root,))
+        wifi_thread.start()
         self.root.mainloop()
 
 class Reloj:
@@ -153,6 +156,34 @@ class Reloj:
 
         # Programa la actualización periódica cada 1000 ms (1 segundo)
         self.texto_hora.after(1000, self.actualizar_tiempo)
+
+class WiFiEstado:
+    def __init__(self, ventana):
+        self.texto_wifi = ctk.CTkLabel(master=ventana, fg_color=("white", "midnight blue"), font=('Radioland', 14, 'bold'))
+        self.texto_wifi.place(relx=0.80, rely=0.93, anchor=ctk.CENTER)
+        self.update_wifi_status()
+
+    def get_wifi_strength(self):
+        try:
+            c = wmi.WMI()
+            for interface in c.Win32_PerfFormattedData_Tcpip_NetworkInterface():
+                print(c.Win32_PerfFormattedData_Tcpip_NetworkInterface())
+                if "Wi-Fi" in interface.Name:
+                    return int(interface.NdisReceivedSignalStrength)
+        except Exception as e:
+            print(f"Error al obtener la fuerza de señal WiFi: {str(e)}")
+        return None
+
+    def update_wifi_status(self):
+        wifi_strength = self.get_wifi_strength()
+        if wifi_strength is not None:
+            # Convert the strength to a number between 0 and 5 for the bars
+            bars = min(wifi_strength // 20) * "|"
+            self.texto_wifi.configure(text=f"Fuerza de señal WiFi: {wifi_strength}%\nBarras de conexión: {bars}")
+        else:
+            self.texto_wifi.configure(text="No se pudo obtener la señal WiFi")
+        
+        self.texto_wifi.after(3000, self.update_wifi_status)  # Actualiza cada segundo
 
 class BateriaEstado:
     def __init__(self, ventana):

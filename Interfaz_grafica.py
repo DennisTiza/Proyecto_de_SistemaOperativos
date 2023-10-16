@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 from base_datos import UserDatabase
 import speech_recognition as sr
 import conexion as base
+import reproductor as musica
 import mysql.connector 
 import keyboard
 import threading
@@ -124,10 +125,17 @@ class VentanaPrincipal:
 
         # CREACION DE LOS BOTONES DE LA BARRA DE MENU
         dx = ctk.CTkImage(Image.open(os.path.join("Imagenes", "DX1.png")),size=(38,38))
+        music = ctk.CTkImage(Image.open(os.path.join("Imagenes", "musica.png")),size=(38,38))
+        editor = ctk.CTkImage(Image.open(os.path.join("Imagenes", "editor.png")),size=(38,38))
+        calculadora = ctk.CTkImage(Image.open(os.path.join("Imagenes", "calculadora.png")),size=(38,38))
         boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16,command=lambda: mostrar_mensaje("Botón 1 presionado"))
         boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
-        boton2 = ctk.CTkButton(master=barra, text="Botón 2", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 2 presionado"))
-        boton2.place(relx=0.1, rely=0.25, anchor=ctk.CENTER)
+        boton2 = ctk.CTkButton(master=barra,image= music, text="", width=30, height= 16, command=lambda: musica)
+        boton2.place(relx=0.072, rely=0.25, anchor=ctk.CENTER)
+        boton3 = ctk.CTkButton(master=barra,image= editor, text="", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 3 presionado"))
+        boton3.place(relx=0.1135, rely=0.25, anchor=ctk.CENTER)
+        boton4 = ctk.CTkButton(master=barra,image= calculadora, text="", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 4 presionado"))
+        boton4.place(relx=0.155, rely=0.25, anchor=ctk.CENTER)
 
         listen_thread = threading.Thread(target=ReconocimientoVoz)
         listen_thread.start()

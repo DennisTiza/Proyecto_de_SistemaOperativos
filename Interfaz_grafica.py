@@ -4,6 +4,8 @@ import os
 from PIL import Image, ImageTk
 from base_datos import UserDatabase
 import speech_recognition as sr
+import conexion as base
+import mysql.connector 
 import keyboard
 import threading
 import psutil
@@ -73,23 +75,33 @@ class Login:
     def validar(self, login):
         obtener_usuario = self.usuario.get() # Obtenemos el nombre de usuario
         obtener_contrasena = self.contrase.get() # Obtenemos la contraseña
-        for user in user_db.users:
-        # Verifica si el valor que tiene el usuario o la contraseña o ambos no coinciden
-            if obtener_usuario != user.username or obtener_contrasena != user.password:
-                # Crea esta etiqueta siempre que el login sea incorrecto
-                self.info_login.configure(text="Usuario o contraseña incorrectos")
-            else:
-                # En caso de tener ya un elemento "info_login" (etiqueta) creado, lo borra
-                if hasattr(self, "info_login"):
-                    self.info_login.destroy()
-                # Crea esta etiqueta siempre que el login sea correcto
-                self. info_login = ctk.CTkLabel(self.root, text=f"Hola, {obtener_usuario}. Espere unos instantes...")
-                self.info_login.pack()
-                # Se destruye la ventana de login
-                self.root.destroy()
-                # Se instancia la ventana de opciones
-                ventana_principal = VentanaPrincipal()
-                break
+
+         # Consulta la base de datos para verificar las credenciales
+        try:
+            conn = base.conexion()  # Conecta a la base de datos
+            if conn:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("SELECT * FROM usuarios WHERE nombre_usuario = %s AND contraseña = %s", (obtener_usuario, obtener_contrasena))
+                user = cursor.fetchone()
+                print(user) 
+
+                if user:
+                    # En caso de tener ya un elemento "info_login" (etiqueta) creado, lo borra
+                    if hasattr(self, "info_login"):
+                        self.info_login.destroy()
+
+                    # Crea esta etiqueta siempre que el login sea correcto
+                    self.info_login = ctk.CTkLabel(self.root, text="Login correcto")
+                    self.info_login.pack(pady=10)
+                    # Se destruye la ventana de login
+                    self.root.destroy()
+                    # Se instancia la ventana de opciones
+                    ventana_principal = VentanaPrincipal()
+                else:
+                    self.info_login.configure(text="Usuario o contraseña incorrectos")
+        except mysql.connector.Error as err:
+            print(f'Error al conectar a la base de datos: {err}')
+
 
 # Class para la ventana principal
 class VentanaPrincipal:
@@ -110,15 +122,25 @@ class VentanaPrincipal:
         barra = ctk.CTkLabel(master=self.root, text="", width= screen_width, height=100,  fg_color=("steel blue", "midnight blue"),corner_radius=8)
         barra.place(relx=0.5, rely=1, anchor=ctk.CENTER)
 
+        # CREACION DE LOS BOTONES DE LA BARRA DE MENU
+        dx = ctk.CTkImage(Image.open(os.path.join("Imagenes", "DX1.png")),size=(38,38))
+        boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16,command=lambda: mostrar_mensaje("Botón 1 presionado"))
+        boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
+        boton2 = ctk.CTkButton(master=barra, text="Botón 2", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 2 presionado"))
+        boton2.place(relx=0.1, rely=0.25, anchor=ctk.CENTER)
+
         listen_thread = threading.Thread(target=ReconocimientoVoz)
         listen_thread.start()
         reloj_thread = threading.Thread(target=Reloj, args=(self.root,))
         reloj_thread.start()
         bateria_thread = threading.Thread(target=BateriaEstado, args=(self.root,))
         bateria_thread.start()
-        wifi_thread = threading.Thread(target=WiFiEstado, args=(self.root,))
-        wifi_thread.start()
+        ##wifi_thread = threading.Thread(target=WiFiEstado, args=(self.root,))
+        ##wifi_thread.start()
+
         self.root.mainloop()
+        def mostrar_mensaje(mensaje):
+            print(mensaje)
 
 class Reloj:
     def __init__(self, ventana):
@@ -231,3 +253,9 @@ class ReconocimientoVoz:
             if keyboard.is_pressed('ctrl'):
                 print("Presionaste Ctrl+M")
                 self.start_listening()
+
+class BarradeTareas:
+    def __init__(self, ventana, barra):
+        self.recognizer = sr.Recognizer() 
+        hilo = threading.Thread(target=self.start_keyboard_hook)
+        hilo.start() 

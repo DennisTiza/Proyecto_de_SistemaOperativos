@@ -10,7 +10,7 @@ import mysql.connector
 import keyboard
 import threading
 import psutil
-import wmi
+import subprocess
 from time import strftime
 # Configuraciones Globales modo color y tema
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -131,11 +131,11 @@ class VentanaPrincipal:
         boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16,command=lambda: mostrar_mensaje("Botón 1 presionado"))
         boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
         boton2 = ctk.CTkButton(master=barra,image= music, text="", width=30, height= 16, command=lambda: musica)
-        boton2.place(relx=0.072, rely=0.25, anchor=ctk.CENTER)
+        boton2.place(relx=0.074, rely=0.25, anchor=ctk.CENTER)
         boton3 = ctk.CTkButton(master=barra,image= editor, text="", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 3 presionado"))
-        boton3.place(relx=0.1135, rely=0.25, anchor=ctk.CENTER)
+        boton3.place(relx=0.117, rely=0.25, anchor=ctk.CENTER)
         boton4 = ctk.CTkButton(master=barra,image= calculadora, text="", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 4 presionado"))
-        boton4.place(relx=0.155, rely=0.25, anchor=ctk.CENTER)
+        boton4.place(relx=0.16, rely=0.25, anchor=ctk.CENTER)
 
         listen_thread = threading.Thread(target=ReconocimientoVoz)
         listen_thread.start()
@@ -143,8 +143,8 @@ class VentanaPrincipal:
         reloj_thread.start()
         bateria_thread = threading.Thread(target=BateriaEstado, args=(self.root,))
         bateria_thread.start()
-        ##wifi_thread = threading.Thread(target=WiFiEstado, args=(self.root,))
-        ##wifi_thread.start()
+        wifi_thread = threading.Thread(target=WiFiEstado, args=(self.root,))
+        wifi_thread.start()
 
         self.root.mainloop()
         def mostrar_mensaje(mensaje):
@@ -190,30 +190,30 @@ class Reloj:
 class WiFiEstado:
     def __init__(self, ventana):
         self.texto_wifi = ctk.CTkLabel(master=ventana, fg_color=("white", "midnight blue"), font=('Radioland', 14, 'bold'))
-        self.texto_wifi.place(relx=0.80, rely=0.93, anchor=ctk.CENTER)
+        self.texto_wifi.place(relx=0.79, rely=0.967, anchor=ctk.CENTER)
         self.update_wifi_status()
 
-    def get_wifi_strength(self):
-        try:
-            c = wmi.WMI()
-            for interface in c.Win32_PerfFormattedData_Tcpip_NetworkInterface():
-                print(c.Win32_PerfFormattedData_Tcpip_NetworkInterface())
-                if "Wi-Fi" in interface.Name:
-                    return int(interface.NdisReceivedSignalStrength)
-        except Exception as e:
-            print(f"Error al obtener la fuerza de señal WiFi: {str(e)}")
-        return None
+    def get_wifi_info(self):
+        cmd = 'netsh wlan show interfaces'
+        output = subprocess.check_output(cmd, shell=True).decode('utf-8', 'ignore') .split('\n')
+    
+        if output:
+            for line in output:
+                if 'Seal' in line:
+                    signal = line.split(':')[1].strip()
+        return signal
 
     def update_wifi_status(self):
-        wifi_strength = self.get_wifi_strength()
+        wifi_strength = self.get_wifi_info()
         if wifi_strength is not None:
+            wifi_strength_num = int(wifi_strength.rstrip('%'))
             # Convert the strength to a number between 0 and 5 for the bars
-            bars = min(wifi_strength // 20) * "|"
-            self.texto_wifi.configure(text=f"Fuerza de señal WiFi: {wifi_strength}%\nBarras de conexión: {bars}")
+            bars = "|" * min(wifi_strength_num // 20, 5)  # Corregido cálculo de las barras
+            self.texto_wifi.configure(text=f"Fuerza de señal WiFi: {wifi_strength}\nBarras de conexión: {bars}")
         else:
             self.texto_wifi.configure(text="No se pudo obtener la señal WiFi")
-        
-        self.texto_wifi.after(3000, self.update_wifi_status)  # Actualiza cada segundo
+
+        self.texto_wifi.after(3000, self.update_wifi_status)  # Actualiza cada 3 segundos
 
 class BateriaEstado:
     def __init__(self, ventana):

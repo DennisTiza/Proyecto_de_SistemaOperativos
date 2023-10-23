@@ -1,5 +1,8 @@
-
-from tkinter import Button, Label,Tk,filedialog, ttk, Frame, PhotoImage
+import customtkinter as Ctk
+from customtkinter import filedialog
+from tkinter import ttk
+from PIL import Image
+import os
 import pygame
 import random
 import mutagen
@@ -147,7 +150,7 @@ def pausa():
 def continuar():
 	pygame.mixer.music.unpause()
 	ventana.after(100 , iniciar_reproduccion)
-ventana =Tk()
+ventana =Ctk.CTk()
 ventana.title('Reproductor de Musica')
 ventana.iconbitmap('Imagenes/icono.ico')
 ventana.config(bg='black')
@@ -158,9 +161,9 @@ estilo.theme_use('clam')
 estilo.configure("Vertical.TProgressbar", foreground='green2', background='green2',troughcolor='black',
 	bordercolor='black',lightcolor='green2', darkcolor='green2')
 
-frame1 = Frame(ventana, bg='black', width=600, height=350)
+frame1 = Ctk.CTkFrame(master=ventana, bg_color='black', width=600, height=350)
 frame1.grid(column=0,row=0, sticky='nsew')
-frame2 = Frame(ventana, bg='black', width=600, height=50)
+frame2 = Ctk.CTkFrame(master=ventana, bg_color='black', width=600, height=50)
 frame2.grid(column=0,row=1, sticky='nsew')
 
 barra1 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") #,takefocus=True mode='determinate',
@@ -211,35 +214,35 @@ estilo1.configure("Horizontal.TProgressbar", foreground='red', background='black
 
 tiempo = ttk.Progressbar(frame2, orient= 'horizontal', length = 390, mode='determinate',style="Horizontal.TProgressbar")
 tiempo.grid(row=0, columnspan=8, padx=5)
-texto = Label(frame2, bg='black', fg='green2', width=5)
+texto = Ctk.CTkLabel(master=frame2, bg_color='black', fg_color='green2', width=5)
 texto.grid(row=0,column=8)
 
-nombre = Label(frame2, bg='black', fg='red', width=55)
+nombre = Ctk.CTkLabel(master=frame2, bg_color='black', fg_color='red', width=55)
 nombre.grid(column=0, row=1, columnspan=8, padx=5)
-cantidad = Label(frame2, bg='black', fg='green2')
+cantidad = Ctk.CTkLabel(master=frame2, bg_color='black', fg_color='green2')
 cantidad.grid(column=8, row=1)
 
-imagen1  = PhotoImage(file ='Imagenes/carpeta.png')
-imagen2  = PhotoImage(file ='Imagenes/play.png')
-imagen3  = PhotoImage(file ='Imagenes/pausa.png')
-imagen4 = PhotoImage(file ='Imagenes/repetir.png')
-imagen5 = PhotoImage(file ='Imagenes/stop.png')
-imagen6 = PhotoImage(file ='Imagenes/anterior.png')
-imagen7 = PhotoImage(file ='Imagenes/adelante.png')
+imagen1 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "carpeta.png")), size=(30,30))
+imagen2 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "play.png")),size=(30,30))
+imagen3 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "pausa.png")),size=(30,30))
+imagen4 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "repetir.png")),size=(30,30))
+imagen5 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "stop.png")),size=(30,30))
+imagen6 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "anterior.png")),size=(30,30))
+imagen7 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "adelante.png")),size=(30,30))
 
-boton1 = Button(frame2, image= imagen1, command= abrir_archivo)
+boton1 = Ctk.CTkButton(master=frame2, image= imagen1, text="", width=30, command= abrir_archivo)
 boton1.grid(column=0, row=2, pady=10)
-boton2 = Button(frame2, image= imagen2, bg='yellow', command=iniciar)
+boton2 = Ctk.CTkButton(master=frame2, image= imagen2, text="",width=30,  bg_color='yellow', command=iniciar)
 boton2.grid(column=1, row=2, pady=10)
-boton3 = Button(frame2,image= imagen3, bg='red', command=stop)
+boton3 = Ctk.CTkButton(master=frame2,image= imagen3, text="",width=30,  bg_color='red', command=stop)
 boton3.grid(column=2, row=2, pady=10)
-boton4 = Button(frame2,image= imagen4, bg='blue', command=pausa)
+boton4 = Ctk.CTkButton(master=frame2,image= imagen4, text="",width=30,  bg_color='blue', command=pausa)
 boton4.grid(column=3, row=2, pady=10)
-boton5 = Button(frame2, image= imagen5, bg='green2',command=continuar)
+boton5 = Ctk.CTkButton(master=frame2, image= imagen5, text="",width=30,  bg_color='green2',command=continuar)
 boton5.grid(column=4, row=2, pady=10)
-atras = Button(frame2, image= imagen6, bg='orange',command= retroceder)
+atras = Ctk.CTkButton(master=frame2, image= imagen6, text="",width=30,   bg_color='orange',command= retroceder)
 atras.grid(column=5, row=2, pady=10)
-adelante = Button(frame2, image= imagen7, bg='green',command=adelantar)
+adelante = Ctk.CTkButton(master=frame2, image= imagen7, text="",width=30,  bg_color='green',command=adelantar)
 adelante.grid(column=6, row=2, pady=10)
 
 volumen = ttk.Scale(frame2, to = 10, from_ =0, orient='horizontal',length=90, style= 'Horizontal.TScale')
@@ -249,7 +252,7 @@ style = ttk.Style()
 style.configure("Horizontal.TScale", bordercolor='green2', troughcolor='black', background= 'green2', 
 	foreground='green2',lightcolor='green2',darkcolor='black')  
 
-nivel = Label(frame2, bg='black', fg='green2', width=3)
+nivel = Ctk.CTkLabel(frame2, bg_color='black', fg_color='green2', width=3)
 nivel.grid(column=8,row=2)
 
 ventana.mainloop()

@@ -2,7 +2,6 @@ import tkinter as tk
 import customtkinter as ctk
 import os
 from PIL import Image, ImageTk
-from base_datos import UserDatabase
 import speech_recognition as sr
 import conexion as base
 import reproductor as musica
@@ -15,7 +14,6 @@ from time import strftime
 # Configuraciones Globales modo color y tema
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
-user_db = UserDatabase(filename="users.json")
 
 class Login:
     def __init__(self):

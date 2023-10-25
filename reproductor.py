@@ -32,7 +32,7 @@ lista = []
 for i in range(50,200,10):
 	lista.append(i)
 
-def iniciar_reproduccion():
+def iniciar_reproduccion(nombre,cantidad,texto,nivel):
 	global cancion_actual, direcion, pos, n, actualizar
 	barra1['value'] = random.choice(lista)
 	barra2['value'] = random.choice(lista)
@@ -58,7 +58,7 @@ def iniciar_reproduccion():
 	cancion_actual = direcion[pos]
 	nombre_cancion = cancion_actual.split('/')
 	nombre_cancion = nombre_cancion[-1]
-	nombre['text']= nombre_cancion
+	nombre.configure(text=nombre_cancion)
 
 	time = pygame.mixer.music.get_pos()
 	x = int(int(time)*0.001)
@@ -66,7 +66,7 @@ def iniciar_reproduccion():
 
 	y = float(int(volumen.get())*0.1)
 	pygame.mixer.music.set_volume(y)
-	nivel['text']= int(y*100)
+	nivel.configure(text= int(y*100))
 
 	audio = mutagen.File(cancion_actual)	
 	log = audio.info.length
@@ -74,27 +74,28 @@ def iniciar_reproduccion():
 
 	minutos, segundos = int(minutos), int(segundos)
 	tt = minutos*60 + segundos
-	tiempo['maximum']= tt  # tiempo total de la cancion
-	texto['text']= str(minutos) + ":" + str(segundos)
-	
-	actualizar = ventana.after(100 , iniciar_reproduccion)
+	tiempo['maximum'] = tt  # tiempo total de la cancion
+	texto.configure(text=str(minutos) + ":" + str(segundos))
 
-	if x == tt:
+	if x < tt:
+		actualizar = ventana.after(100, lambda: iniciar_reproduccion(nombre, cantidad, texto, nivel))
+	else:
 		ventana.after_cancel(actualizar)
-		texto['text']= "00:00"
+		texto.configure(text="00:00")
 		detener_efecto()
 		if pos != n:
 			pos = pos + 1
-			ventana.after(100 , iniciar_reproduccion)
+			iniciar(nombre, cantidad, texto, nivel)
 			pygame.mixer.music.play()
 		if pos == n:
 			pos = 0
 
-def iniciar():
+
+def iniciar(nombre,cantidad,texto,nivel):
 	global cancion_actual
 	pygame.mixer.music.load(cancion_actual)
 	pygame.mixer.music.play()
-	iniciar_reproduccion()
+	iniciar_reproduccion(nombre,cantidad,texto,	nivel)
 
 def retroceder():
 	global pos,n
@@ -103,16 +104,16 @@ def retroceder():
 		pos = pos-1
 	else:
 		pos = 0
-	cantidad['text'] = str(pos)+'/'+str(n)
+	cantidad.configure(text=str(pos)+'/'+str(n))
 
-def adelantar():
+def adelantar(cantidad):
 	global pos, n
 
 	if pos == n-1:
 		pos = 0
 	else:
 		pos = pos + 1
-	cantidad['text'] = str(pos)+'/'+str(n)
+	cantidad.configure(text=str(pos)+'/'+str(n))
 
 
 def detener_efecto():
@@ -153,74 +154,75 @@ def continuar():
 ventana =Ctk.CTk()
 ventana.title('Reproductor de Musica')
 ventana.iconbitmap('Imagenes/icono.ico')
-ventana.config(bg='black')
 ventana.resizable(0,0)
 
 estilo = ttk.Style()
 estilo.theme_use('clam')
-estilo.configure("Vertical.TProgressbar", foreground='green2', background='green2',troughcolor='black',
-	bordercolor='black',lightcolor='green2', darkcolor='green2')
+estilo.configure("Vertical.TProgressbar", foreground='green2', background='green2',troughcolor="#404040",
+	bordercolor='#404040',lightcolor='green2', darkcolor='green2')
 
-frame1 = Ctk.CTkFrame(master=ventana, bg_color='black', width=600, height=350)
-frame1.grid(column=0,row=0, sticky='nsew')
-frame2 = Ctk.CTkFrame(master=ventana, bg_color='black', width=600, height=50)
-frame2.grid(column=0,row=1, sticky='nsew')
+frame1 = Ctk.CTkFrame(master=ventana, width=600, height=500)
+frame1.grid(column=0,row=0)
+frame2 = Ctk.CTkFrame(master=ventana, width=600, height=50)
+frame2.grid(column=0,row=1)
 
 barra1 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") #,takefocus=True mode='determinate',
-barra1.grid(column=0,row=0, padx = 1)
+barra1.grid(column=0,row=0, padx = 1,pady=1)
 barra2 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra2.grid(column=1,row=0, padx = 1)
+barra2.grid(column=1,row=0, padx = 1,pady=1)
 barra3 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra3.grid(column=2,row=0, padx = 1)
+barra3.grid(column=2,row=0, padx = 1,pady=1)
 barra4 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra4.grid(column=3,row=0, padx = 1)
+barra4.grid(column=3,row=0, padx = 1,pady=1)
 barra5 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra5.grid(column=4,row=0, padx = 1)
+barra5.grid(column=4,row=0, padx = 1,pady=1)
 barra6 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra6.grid(column=5,row=0, padx = 1)
+barra6.grid(column=5,row=0, padx = 1,pady=1)
 barra7 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") #,takefocus=True
-barra7.grid(column=6,row=0, padx = 1)
+barra7.grid(column=6,row=0, padx = 1,pady=1)
 barra8 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra8.grid(column=7,row=0, padx = 1)
+barra8.grid(column=7,row=0, padx = 1,pady=1)
 barra9 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra9.grid(column=8,row=0, padx = 1)
+barra9.grid(column=8,row=0, padx = 1,pady=1)
 barra10 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra10.grid(column=9,row=0, padx = 1)
+barra10.grid(column=9,row=0, padx = 1,pady=1)
 barra11 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra11.grid(column=10,row=0, padx = 1)
+barra11.grid(column=10,row=0, padx = 1,pady=1)
 barra12 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra12.grid(column=11,row=0, padx = 1)
+barra12.grid(column=11,row=0, padx = 1,pady=1)
 barra13 = ttk.Progressbar(frame1, orient= 'vertical',length=300,  maximum=300, style="Vertical.TProgressbar")
-barra13.grid(column=12,row=0, padx = 1)
+barra13.grid(column=12,row=0, padx = 1,pady=1)
 barra14 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") 
-barra14.grid(column=13,row=0, padx = 1)
+barra14.grid(column=13,row=0, padx = 1,pady=1)
 barra15 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") 
-barra15.grid(column=14,row=0, padx = 1)
+barra15.grid(column=14,row=0, padx = 1,pady=1)
 barra16 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") 
-barra16.grid(column=15,row=0, padx = 1)
+barra16.grid(column=15,row=0, padx = 1,pady=1)
 barra17 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") 
-barra17.grid(column=16,row=0, padx = 1)
+barra17.grid(column=16,row=0, padx = 1,pady=1)
 barra18 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") 
-barra18.grid(column=17,row=0, padx = 1)
+barra18.grid(column=17,row=0, padx = 1,pady=1)
 barra19 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") 
-barra19.grid(column=18,row=0, padx = 1)
+barra19.grid(column=18,row=0, padx = 1,pady=1)
 barra20 = ttk.Progressbar(frame1, orient= 'vertical', length=300,  maximum=300, style="Vertical.TProgressbar") 
-barra20.grid(column=19,row=0, padx = 1)
+barra20.grid(column=19,row=0, padx = 1,pady=1)
 
 estilo1 = ttk.Style()
 estilo1.theme_use('clam')
 estilo1.configure("Horizontal.TProgressbar", foreground='red', background='black',troughcolor='DarkOrchid1',
 																bordercolor='#970BD9',lightcolor='#970BD9', darkcolor='black')
 
-tiempo = ttk.Progressbar(frame2, orient= 'horizontal', length = 390, mode='determinate',style="Horizontal.TProgressbar")
+tiempo = ttk.Progressbar(master=frame2, orient= 'horizontal', length = 390, mode='determinate',style="Horizontal.TProgressbar")
 tiempo.grid(row=0, columnspan=8, padx=5)
-texto = Ctk.CTkLabel(master=frame2, bg_color='black', fg_color='green2', width=5)
+texto = Ctk.CTkLabel(master=frame2, text="", width=5)
 texto.grid(row=0,column=8)
 
-nombre = Ctk.CTkLabel(master=frame2, bg_color='black', fg_color='red', width=55)
+nombre = Ctk.CTkLabel(master=frame2, text="", width=55)
 nombre.grid(column=0, row=1, columnspan=8, padx=5)
-cantidad = Ctk.CTkLabel(master=frame2, bg_color='black', fg_color='green2')
+cantidad = Ctk.CTkLabel(master=frame2, text="")
 cantidad.grid(column=8, row=1)
+nivel = Ctk.CTkLabel(frame2, text="", width=3)
+nivel.grid(column=8,row=2)
 
 imagen1 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "carpeta.png")), size=(30,30))
 imagen2 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "play.png")),size=(30,30))
@@ -230,30 +232,27 @@ imagen5 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "stop.png")),size=(30
 imagen6 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "anterior.png")),size=(30,30))
 imagen7 = Ctk.CTkImage(Image.open(os.path.join("Imagenes", "adelante.png")),size=(30,30))
 
-boton1 = Ctk.CTkButton(master=frame2, image= imagen1, text="", width=30, command= abrir_archivo)
-boton1.grid(column=0, row=2, pady=10)
-boton2 = Ctk.CTkButton(master=frame2, image= imagen2, text="",width=30,  bg_color='yellow', command=iniciar)
-boton2.grid(column=1, row=2, pady=10)
-boton3 = Ctk.CTkButton(master=frame2,image= imagen3, text="",width=30,  bg_color='red', command=stop)
-boton3.grid(column=2, row=2, pady=10)
-boton4 = Ctk.CTkButton(master=frame2,image= imagen4, text="",width=30,  bg_color='blue', command=pausa)
-boton4.grid(column=3, row=2, pady=10)
-boton5 = Ctk.CTkButton(master=frame2, image= imagen5, text="",width=30,  bg_color='green2',command=continuar)
-boton5.grid(column=4, row=2, pady=10)
-atras = Ctk.CTkButton(master=frame2, image= imagen6, text="",width=30,   bg_color='orange',command= retroceder)
-atras.grid(column=5, row=2, pady=10)
-adelante = Ctk.CTkButton(master=frame2, image= imagen7, text="",width=30,  bg_color='green',command=adelantar)
-adelante.grid(column=6, row=2, pady=10)
+boton1 = Ctk.CTkButton(master=frame2, image= imagen1, text="", width=30, command=abrir_archivo)
+boton1.grid(column=0, row=2, pady=10, padx=2)
+boton2 = Ctk.CTkButton(master=frame2, image= imagen2, text="",width=30, command=lambda: iniciar(nombre,cantidad,texto,nivel))
+boton2.grid(column=1, row=2, pady=10, padx=2)
+boton3 = Ctk.CTkButton(master=frame2,image= imagen3, text="",width=30, command=stop)
+boton3.grid(column=2, row=2, pady=10, padx=2)
+boton4 = Ctk.CTkButton(master=frame2,image= imagen4, text="",width=30, command=pausa)
+boton4.grid(column=3, row=2, pady=10, padx=2)
+boton5 = Ctk.CTkButton(master=frame2, image= imagen5, text="",width=30,command=continuar)
+boton5.grid(column=4, row=2, pady=10, padx=2)
+atras = Ctk.CTkButton(master=frame2, image= imagen6, text="",width=30,command= lambda: retroceder(cantidad))
+atras.grid(column=5, row=2, pady=10, padx=2)
+adelante = Ctk.CTkButton(master=frame2, image= imagen7, text="",width=30,command=lambda: adelantar(cantidad))
+adelante.grid(column=6, row=2, pady=10, padx=2)
 
 volumen = ttk.Scale(frame2, to = 10, from_ =0, orient='horizontal',length=90, style= 'Horizontal.TScale')
 volumen.grid(column=7, row=2)
 
 style = ttk.Style()
-style.configure("Horizontal.TScale", bordercolor='green2', troughcolor='black', background= 'green2', 
-	foreground='green2',lightcolor='green2',darkcolor='black')  
-
-nivel = Ctk.CTkLabel(frame2, bg_color='black', fg_color='green2', width=3)
-nivel.grid(column=8,row=2)
+style.configure("Horizontal.TScale", bordercolor='blue', troughcolor='black', background= 'Mediumturquoise', 
+	foreground='red',lightcolor='Mediumturquoise',darkcolor='black')  
 
 ventana.mainloop()
 

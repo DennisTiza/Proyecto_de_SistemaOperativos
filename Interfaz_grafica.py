@@ -6,6 +6,8 @@ import speech_recognition as sr
 import conexion as base
 import reproductor as musica
 import mysql.connector 
+import editor as Appeditor
+import visorImagenes as visor
 import keyboard
 import threading
 import psutil
@@ -126,16 +128,20 @@ class VentanaPrincipal:
         music = ctk.CTkImage(Image.open(os.path.join("Imagenes", "musica.png")),size=(38,38))
         editor = ctk.CTkImage(Image.open(os.path.join("Imagenes", "editor.png")),size=(38,38))
         calculadora = ctk.CTkImage(Image.open(os.path.join("Imagenes", "calculadora.png")),size=(38,38))
+        imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "imagen.png")),size=(38,38))
+
         boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16,command=lambda: mostrar_mensaje("Botón 1 presionado"))
         boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
-        boton2 = ctk.CTkButton(master=barra,image= music, text="", width=30, height= 16, command=lambda: musica)
+        boton2 = ctk.CTkButton(master=barra,image= music, text="", width=30, height= 16, command = lambda: musica.init(self.root))
         boton2.place(relx=0.074, rely=0.25, anchor=ctk.CENTER)
-        boton3 = ctk.CTkButton(master=barra,image= editor, text="", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 3 presionado"))
+        boton3 = ctk.CTkButton(master=barra,image= editor, text="", width=30, height= 16, command=lambda: Appeditor.init(self.root))
         boton3.place(relx=0.117, rely=0.25, anchor=ctk.CENTER)
         boton4 = ctk.CTkButton(master=barra,image= calculadora, text="", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 4 presionado"))
         boton4.place(relx=0.16, rely=0.25, anchor=ctk.CENTER)
+        boton5 = ctk.CTkButton(master=barra,image= imagen, text="", width=30, height= 16, command=lambda: visor.init(self.root))
+        boton5.place(relx=0.203, rely=0.25, anchor=ctk.CENTER)
 
-        listen_thread = threading.Thread(target=ReconocimientoVoz)
+        listen_thread = threading.Thread(target=ReconocimientoVoz, args=(self.root,))
         listen_thread.start()
         reloj_thread = threading.Thread(target=Reloj, args=(self.root,))
         reloj_thread.start()
@@ -228,10 +234,12 @@ class BateriaEstado:
 
 # Class para el reconocimiento de voz   
 class ReconocimientoVoz:
-    def __init__(self):
+    def __init__(self, ventana):
+        global ventana_principal
+        ventana_principal = ventana
         self.recognizer = sr.Recognizer() 
         hilo = threading.Thread(target=self.start_keyboard_hook)
-        hilo.start()   
+        hilo.start()  
 
         # Función para iniciar el reconocimiento de voz
     def start_listening(self):
@@ -242,8 +250,10 @@ class ReconocimientoVoz:
         try:
             text = self.recognizer.recognize_google(audio)
             print("Has dicho: {}".format(text))
-            if text == 'open system':
-                print("Abriendo sistema")
+            if text == 'open music':
+                musica.init(ventana_principal)
+            if text == 'open editor':
+                Appeditor.init(ventana_principal)
         except sr.UnknownValueError:
             print("No se pudo entender lo que dijiste")
         except sr.RequestError as e:

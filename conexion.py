@@ -1,4 +1,5 @@
 import mysql.connector
+import bcrypt
 
 def conexion():
     # Configura la conexión a la base de datos
@@ -48,21 +49,20 @@ def obtener_usuarios(conn):
         return None
     
 def insertar_usuario(conn, nombre, apellido, nombre_usuario, contraseña):
-    """Insertar un nuevo usuario en la tabla de usuarios."""
     if conn is None:
         print('No se pudo establecer la conexión.')
         return
 
     try:
         cursor = conn.cursor()
+        # Utiliza bcrypt para hashear la contraseña
+        hashed_password = bcrypt.hashpw(contraseña.encode('utf-8'), bcrypt.gensalt())
         sql = "INSERT INTO usuarios (nombre, apellido, nombre_usuario, contraseña) VALUES (%s, %s, %s, %s)"
-        datos_usuario = (nombre, apellido, nombre_usuario, contraseña)
+        datos_usuario = (nombre, apellido, nombre_usuario, hashed_password.decode('utf-8'))
         cursor.execute(sql, datos_usuario)
         conn.commit()
         print('Usuario insertado con éxito.')
         cursor.close()
     except mysql.connector.Error as err:
-        print(f'Error: {err}')
+        print(f'Error al insertar usuario: {err}')
         conn.rollback()
-
-

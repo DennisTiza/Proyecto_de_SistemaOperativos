@@ -8,8 +8,10 @@ import reproductor as musica
 import mysql.connector 
 import editor as Appeditor
 import visorImagenes as visor
+import visordevideos as visorvideo
 import keyboard
 import threading
+import bcrypt
 import psutil
 import subprocess
 from time import strftime
@@ -74,35 +76,34 @@ class Login:
 
         # Función para validar el login
     def validar(self, login):
-        obtener_usuario = self.usuario.get() # Obtenemos el nombre de usuario
-        obtener_contrasena = self.contrase.get() # Obtenemos la contraseña
+        obtener_usuario = self.usuario.get()  # Obtenemos el nombre de usuario
+        obtener_contrasena = self.contrase.get()  # Obtenemos la contraseña
 
-         # Consulta la base de datos para verificar las credenciales
         try:
             conn = base.conexion()  # Conecta a la base de datos
             if conn:
                 cursor = conn.cursor(dictionary=True)
-                cursor.execute("SELECT * FROM usuarios WHERE nombre_usuario = %s AND contraseña = %s", (obtener_usuario, obtener_contrasena))
+                cursor.execute("SELECT * FROM usuarios WHERE nombre_usuario = %s", (obtener_usuario,))
                 user = cursor.fetchone()
-                print(user) 
 
                 if user:
-                    # En caso de tener ya un elemento "info_login" (etiqueta) creado, lo borra
-                    if hasattr(self, "info_login"):
-                        self.info_login.destroy()
+                    stored_hashed_password = user.get('contraseña', '')  # Obtén el hash almacenado en la base de datos
 
-                    # Crea esta etiqueta siempre que el login sea correcto
-                    self.info_login = ctk.CTkLabel(self.root, text="Login correcto")
-                    self.info_login.pack(pady=10)
-                    # Se destruye la ventana de login
-                    self.root.destroy()
-                    # Se instancia la ventana de opciones
-                    ventana_principal = VentanaPrincipal()
+                    # Verifica la contraseña utilizando bcrypt
+                    if bcrypt.checkpw(obtener_contrasena.encode('utf-8'), stored_hashed_password.encode('utf-8')):
+                        if hasattr(self, "info_login"):
+                            self.info_login.destroy()
+
+                        self.info_login = ctk.CTkLabel(self.root, text="Login correcto")
+                        self.info_login.pack(pady=10)
+                        self.root.destroy()
+                        ventana_principal = VentanaPrincipal()
+                    else:
+                        self.info_login.configure(text="Usuario o contraseña incorrectos")
                 else:
                     self.info_login.configure(text="Usuario o contraseña incorrectos")
         except mysql.connector.Error as err:
             print(f'Error al conectar a la base de datos: {err}')
-
 
 # Class para la ventana principal
 class VentanaPrincipal:
@@ -124,11 +125,12 @@ class VentanaPrincipal:
         barra.place(relx=0.5, rely=1, anchor=ctk.CENTER)
 
         # CREACION DE LOS BOTONES DE LA BARRA DE MENU
-        dx = ctk.CTkImage(Image.open(os.path.join("Imagenes", "DX1.png")),size=(38,38))
+        dx = ctk.CTkImage(Image.open(os.path.join("Imagenes", "DX1.png")),size=(50,38))
         music = ctk.CTkImage(Image.open(os.path.join("Imagenes", "musica.png")),size=(38,38))
         editor = ctk.CTkImage(Image.open(os.path.join("Imagenes", "editor.png")),size=(38,38))
         calculadora = ctk.CTkImage(Image.open(os.path.join("Imagenes", "calculadora.png")),size=(38,38))
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "imagen.png")),size=(38,38))
+        video = ctk.CTkImage(Image.open(os.path.join("Imagenes", "video.png")),size=(38,38))
 
         boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16,command=lambda: mostrar_mensaje("Botón 1 presionado"))
         boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
@@ -140,6 +142,8 @@ class VentanaPrincipal:
         boton4.place(relx=0.16, rely=0.25, anchor=ctk.CENTER)
         boton5 = ctk.CTkButton(master=barra,image= imagen, text="", width=30, height= 16, command=lambda: visor.init(self.root))
         boton5.place(relx=0.203, rely=0.25, anchor=ctk.CENTER)
+        boton6 = ctk.CTkButton(master=barra,image= video, text="", width=30, height= 16, command=lambda: visorvideo.init(self.root))
+        boton6.place(relx=0.246, rely=0.25, anchor=ctk.CENTER)
 
         listen_thread = threading.Thread(target=ReconocimientoVoz, args=(self.root,))
         listen_thread.start()

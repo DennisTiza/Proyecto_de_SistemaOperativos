@@ -9,6 +9,8 @@ import mysql.connector
 import editor as Appeditor
 import visorImagenes as visor
 import visordevideos as visorvideo
+import calculadora as calcu
+import fileManager as filemanager
 import keyboard
 import threading
 import bcrypt
@@ -125,25 +127,28 @@ class VentanaPrincipal:
         barra.place(relx=0.5, rely=1, anchor=ctk.CENTER)
 
         # CREACION DE LOS BOTONES DE LA BARRA DE MENU
-        dx = ctk.CTkImage(Image.open(os.path.join("Imagenes", "DX1.png")),size=(50,38))
+        dx = ctk.CTkImage(Image.open(os.path.join("Imagenes", "DX1.png")),size=(38,38))
         music = ctk.CTkImage(Image.open(os.path.join("Imagenes", "musica.png")),size=(38,38))
         editor = ctk.CTkImage(Image.open(os.path.join("Imagenes", "editor.png")),size=(38,38))
         calculadora = ctk.CTkImage(Image.open(os.path.join("Imagenes", "calculadora.png")),size=(38,38))
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "imagen.png")),size=(38,38))
         video = ctk.CTkImage(Image.open(os.path.join("Imagenes", "video.png")),size=(38,38))
+        carpeta = ctk.CTkImage(Image.open(os.path.join("Imagenes", "carpetas.png")),size=(38,38))
 
-        boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16,command=lambda: mostrar_mensaje("Botón 1 presionado"))
+        boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16)
         boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
         boton2 = ctk.CTkButton(master=barra,image= music, text="", width=30, height= 16, command = lambda: musica.init(self.root))
         boton2.place(relx=0.074, rely=0.25, anchor=ctk.CENTER)
         boton3 = ctk.CTkButton(master=barra,image= editor, text="", width=30, height= 16, command=lambda: Appeditor.init(self.root))
         boton3.place(relx=0.117, rely=0.25, anchor=ctk.CENTER)
-        boton4 = ctk.CTkButton(master=barra,image= calculadora, text="", width=30, height= 16, command=lambda: mostrar_mensaje("Botón 4 presionado"))
+        boton4 = ctk.CTkButton(master=barra,image= calculadora, text="", width=30, height= 16, command=lambda: calcu.init(self.root))
         boton4.place(relx=0.16, rely=0.25, anchor=ctk.CENTER)
         boton5 = ctk.CTkButton(master=barra,image= imagen, text="", width=30, height= 16, command=lambda: visor.init(self.root))
         boton5.place(relx=0.203, rely=0.25, anchor=ctk.CENTER)
         boton6 = ctk.CTkButton(master=barra,image= video, text="", width=30, height= 16, command=lambda: visorvideo.init(self.root))
         boton6.place(relx=0.246, rely=0.25, anchor=ctk.CENTER)
+        boton7 = ctk.CTkButton(master=barra,image= carpeta, text="", width=30, height= 16, command=lambda: filemanager.init())
+        boton7.place(relx=0.289, rely=0.25, anchor=ctk.CENTER)
 
         listen_thread = threading.Thread(target=ReconocimientoVoz, args=(self.root,))
         listen_thread.start()
@@ -155,8 +160,6 @@ class VentanaPrincipal:
         wifi_thread.start()
 
         self.root.mainloop()
-        def mostrar_mensaje(mensaje):
-            print(mensaje)
 
 class Reloj:
     def __init__(self, ventana):

@@ -3,7 +3,7 @@ from customtkinter import filedialog
 from PIL import Image, ImageEnhance, ImageTk
 
 class VisualizadorImagenes:
-    def __init__(self, root):
+    def __init__(self, root, ruta):
         self.root = root
         self.root.title("Visor de Imágenes")
         self.root.geometry("750x620")
@@ -44,6 +44,11 @@ class VisualizadorImagenes:
 
         self.image = None
         self.display_image = None
+
+        if ruta != "":
+            self.images.append(Image.open(ruta))
+            self.resize_large_image(self.images[0])
+            self.display_current_image()
 
     def cargarimagen(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png *.gif *.bmp *.ppm *.pgm *.tif")])
@@ -95,7 +100,13 @@ class VisualizadorImagenes:
             self.image_label.image = opacity_photo
 
 def init(principal):
+    rutanula = ""
     root = ctk.CTkToplevel(master=principal)
     root.attributes('-topmost', 1)
-    viewer = VisualizadorImagenes(root)
+    viewer = VisualizadorImagenes(root, rutanula)
     principal.mainloop()
+
+def cargar(principal, ruta):
+    root = ctk.CTkToplevel(master=principal)
+    root.attributes('-topmost', 1)
+    viewer = VisualizadorImagenes(root, ruta)

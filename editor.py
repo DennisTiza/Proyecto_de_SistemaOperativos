@@ -4,11 +4,11 @@ from customtkinter import CTkLabel
 from customtkinter import filedialog as FileDialog
 from tkinter import Menu as tkMenu, Text as Texto
 from io import open
-def init(principal):
+
+def init(principal, rut):
     global ruta  # Declarar ruta como global
-
-    ruta = "" 
-
+    ruta = rut
+  
     def nuevo():
         global ruta  # Usa nonlocal para indicar que ruta es la variable en el ámbito superior
         mensaje.set("Nuevo fichero")
@@ -31,6 +31,20 @@ def init(principal):
             texto.insert('insert', contenido)
             fichero.close()
             root.title(ruta + " - Editor de Texto")
+
+    def cargar(rut):
+        global ruta
+        ruta = rut
+        mensaje.set("Abrir fichero")
+        if ruta != "":
+            fichero = open(ruta, 'r')
+            contenido = fichero.read()
+            texto.delete(1.0,'end')
+            texto.insert('insert', contenido)
+            fichero.close()
+            root.title(ruta + " - Editor de Texto")
+
+
 
     def guardar():
         global ruta  # Usa nonlocal para indicar que ruta es la variable en el ámbito superior
@@ -91,5 +105,6 @@ def init(principal):
     monitor.pack(side="top", anchor="center")
 
     root.config(menu=menubar)
-    # Finalmente bucle de la apliación
-    principal.mainloop()
+
+    if ruta != "":
+        cargar(ruta)

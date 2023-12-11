@@ -17,6 +17,7 @@ import threading
 import bcrypt
 import psutil
 import subprocess
+from globals import root
 from time import strftime
 # Configuraciones Globales modo color y tema
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -111,7 +112,9 @@ class Login:
 # Class para la ventana principal
 class VentanaPrincipal:
     def __init__(self, user):
+        global root
         self.root = ctk.CTk()
+        root = self.root
         self.root.title("Supra Os")
         self.root.attributes('-fullscreen', True)
         screen_width = self.root.winfo_screenwidth()
@@ -135,12 +138,13 @@ class VentanaPrincipal:
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "imagen.png")),size=(38,38))
         video = ctk.CTkImage(Image.open(os.path.join("Imagenes", "video.png")),size=(38,38))
         carpeta = ctk.CTkImage(Image.open(os.path.join("Imagenes", "carpetas.png")),size=(38,38))
+        rut = ""
 
         boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16, command=lambda: inicio.init(self.root, user))
         boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
         boton2 = ctk.CTkButton(master=barra,image= music, text="", width=30, height= 16, command = lambda: musica.init(self.root))
         boton2.place(relx=0.074, rely=0.25, anchor=ctk.CENTER)
-        boton3 = ctk.CTkButton(master=barra,image= editor, text="", width=30, height= 16, command=lambda: Appeditor.init(self.root))
+        boton3 = ctk.CTkButton(master=barra,image= editor, text="", width=30, height= 16, command=lambda: Appeditor.init(self.root, rut))
         boton3.place(relx=0.117, rely=0.25, anchor=ctk.CENTER)
         boton4 = ctk.CTkButton(master=barra,image= calculadora, text="", width=30, height= 16, command=lambda: calcu.init(self.root))
         boton4.place(relx=0.16, rely=0.25, anchor=ctk.CENTER)
@@ -161,6 +165,7 @@ class VentanaPrincipal:
         wifi_thread.start()
 
         self.root.mainloop()
+
 
 class Reloj:
     def __init__(self, ventana):

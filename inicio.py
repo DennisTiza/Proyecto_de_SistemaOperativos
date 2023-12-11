@@ -63,11 +63,11 @@ class Inicio:
         ctk.CTkLabel(tifo, text="Rol", fg_color="transparent").pack()
         roles = ["admin", "usuario"]
         rol_seleccionado = ctk.CTkComboBox(tifo, values=roles)
-        rol_seleccionado.pack(pady=10, padx=10)
+        rol_seleccionado.pack()
         #Informacion
         info = ctk.CTkLabel(tifo, text="")
         #Boton de confirmacion
-        ctk.CTkButton(tifo, text="Confirmar", command=lambda: self.confirmar(nombre, apellido, usuario, contraseña, rol_seleccionado, info)).pack()
+        ctk.CTkButton(tifo, text="Confirmar", command=lambda: self.confirmar(nombre, apellido, usuario, contraseña, rol_seleccionado, info)).pack(pady=10)
         info.pack()
         self.root.geometry("400x550")
 
@@ -93,7 +93,7 @@ class Inicio:
         #Informacion
         info = ctk.CTkLabel(tifo, text="")
         #Boton de confirmacion
-        ctk.CTkButton(tifo, text="Confirmar", command=lambda: self.confirmareditar(user,nombre, apellido, usuario, contraseña,info)).pack()
+        ctk.CTkButton(tifo, text="Confirmar", command=lambda: self.confirmareditar(user,nombre, apellido, usuario, contraseña,info)).pack(pady=10)
         info.pack()
         self.root.geometry("400x550")
     

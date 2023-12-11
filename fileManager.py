@@ -25,6 +25,8 @@ class FileManager(CTkToplevel):
         NavBarRigth(self)
         self.update_aside()
         self.update_home()
+    
+
 
     def update_home(self, parent=None,  listdir=None):
         parent = parent and parent or self.parent
@@ -34,6 +36,7 @@ class FileManager(CTkToplevel):
     def update_aside(self):
         self.listdir = Folder(self.current_dir).list_content
         Aside(master=self, listdir=self.listdir)
+    
 
     def main(self):
         self.configure()
@@ -42,4 +45,5 @@ class FileManager(CTkToplevel):
 def init(user):
     if user['rol'] == 'admin':
         filemanger = FileManager("Usuarios")
-    filemanger = FileManager("Usuarios/"+str(user['id']))
+    if user['rol'] == 'usuario':
+        filemanger = FileManager("Usuarios/"+str(user['id']))

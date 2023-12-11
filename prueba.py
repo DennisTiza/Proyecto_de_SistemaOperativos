@@ -6,7 +6,7 @@ class Reproductor:
     def agregar(self):
         canciones = filedialog.askopenfilenames(initialdir="/", title="Selecciona una canción", filetypes=(("Archivos mp3", "*.mp3"), ("all files", "*.*")))
         for cancion in canciones:
-            cancion = cancion.replace("C:/Users/Usuario/Downloads/", "")
+            cancion = cancion.replace("C:/Usuarios", "")
             cancion = cancion.replace(".mp3", "")
             self.pantalla.insert(END, cancion)
 
@@ -15,6 +15,12 @@ class Reproductor:
         cancion = f'{cancion}.mp3'
         pygame.mixer.music.load(cancion)
         pygame.mixer.music.play(loops=0)
+    
+    def cargar(self, ruta):
+        cancion = ruta
+        cancion = cancion.replace("C:/Usuarios", "")
+        cancion = cancion.replace(".mp3", "")
+        self.pantalla.insert(END, cancion)
 
     def stop(self):
         pygame.mixer.music.stop()
@@ -60,7 +66,7 @@ class Reproductor:
         self.pantalla.delete(0, END)
         pygame.mixer.music.stop()
 
-    def __init__(self, root):
+    def __init__(self, root, ruta):
         pygame.mixer.init()
         global pausa
         pausa = True
@@ -96,10 +102,23 @@ class Reproductor:
         remover.add_command(label="Borrar una canción de la pantalla", command=self.borrar)
         remover.add_command(label="Borrar todas las canciones de la pantalla", command=self.borrar_todo)
 
+        if ruta != "":
+            self.cargar(ruta)
+
 
 def init(principal):
+    rutanula = ""
     root = CTkToplevel(master=principal)
     root.title("Reproductor de música")
     root.attributes('-topmost', 1)
-    musica = Reproductor(root)
+    musica = Reproductor(root, rutanula)
     principal.mainloop()
+
+def cargar(principal, ruta):
+    rutanula = ruta
+    root = CTkToplevel(master=principal)
+    root.title("Reproductor de música")
+    root.attributes('-topmost', 1)
+    musica = Reproductor(root, ruta)
+
+

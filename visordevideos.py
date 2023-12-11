@@ -6,7 +6,7 @@ import imutils
 
 class VisorDeVideo:
 
-    def __init__(self, master):
+    def __init__(self, master, ruta):
         self.cap = None
         self.paused = False
 
@@ -24,6 +24,12 @@ class VisorDeVideo:
 
         self.btnPause = ctk.CTkButton(master, text="Pausar", command=self.toggle_pause)
         self.btnPause.grid(row=3, column=0, padx=5, pady=5, columnspan=2)
+
+        if ruta != "":
+            self.lblInfoVideo.configure(text=ruta)
+            self.cap = cv2.VideoCapture(ruta)
+            self.visualizar()
+            
 
 
     def visualizar(self):
@@ -45,7 +51,6 @@ class VisorDeVideo:
                 self.lblInfoVideo.configure(text="No se ha seleccionado ningún video")
                 self.lblvideo.image = ""
                 self.cap.release()
-
 
 
     def cargarvideo(self):
@@ -73,8 +78,15 @@ class VisorDeVideo:
             
 
 def init(principal):
+    rutanula = ""
     root = ctk.CTkToplevel(master=principal)
     root.title("Visor de videos")
     root.attributes('-topmost', 1)
-    viewer = VisorDeVideo(root)
+    viewer = VisorDeVideo(root, rutanula)
     principal.mainloop()
+
+def cargar(principal, ruta):
+    root = ctk.CTkToplevel(master=principal)
+    root.title("Visor de videos")
+    root.attributes('-topmost', 1)
+    viewer = VisorDeVideo(root, ruta)

@@ -1,6 +1,11 @@
 from customtkinter import CTkImage
 from os import path, rename, startfile
+import visordevideos
+import visorImagenes
+import prueba
+import editor
 from PIL import Image
+from globals import root
 
 from subprocess import run
 
@@ -43,10 +48,17 @@ class File:
         run(['touch', self._path])
 
     def open_file(self):
-        # print(self._path)
-        # run(['xdg-open', self._path])
-        startfile(self._path)
-        
+        file_extension = path.splitext(self._name)[1].lower()
+        if file_extension in ['.mp3', '.wav', '.ogg', '.flac', '.aac']:
+            prueba.cargar(root, self._path)
+        elif file_extension in ['.mp4', '.avi', '.mkv', '.mov']:
+            visordevideos.cargar(root, self._path)
+        elif file_extension in ['.txt']:
+            editor.init(root, self._path)
+        elif file_extension in ['.png', '.jpg', '.jpeg']:
+            visorImagenes.cargar(root, self._path)
+        else:
+            print(f"Unsupported file type: {file_extension}")
 
     def cut(self, new_path):
         run(['mv', self._path, new_path])

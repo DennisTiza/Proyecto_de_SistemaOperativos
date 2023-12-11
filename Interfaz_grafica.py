@@ -18,6 +18,7 @@ import bcrypt
 import psutil
 import subprocess
 from globals import root
+from web import abrir_google
 from time import strftime
 # Configuraciones Globales modo color y tema
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
@@ -138,6 +139,7 @@ class VentanaPrincipal:
         imagen = ctk.CTkImage(Image.open(os.path.join("Imagenes", "imagen.png")),size=(38,38))
         video = ctk.CTkImage(Image.open(os.path.join("Imagenes", "video.png")),size=(38,38))
         carpeta = ctk.CTkImage(Image.open(os.path.join("Imagenes", "carpetas.png")),size=(38,38))
+        google = ctk.CTkImage(Image.open(os.path.join("Imagenes", "google.png")),size=(38,38))
         rut = ""
 
         boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16, command=lambda: inicio.init(self.root, user))
@@ -154,6 +156,8 @@ class VentanaPrincipal:
         boton6.place(relx=0.246, rely=0.25, anchor=ctk.CENTER)
         boton7 = ctk.CTkButton(master=barra,image= carpeta, text="", width=30, height= 16, command=lambda: filemanager.init(user))
         boton7.place(relx=0.289, rely=0.25, anchor=ctk.CENTER)
+        boton8 = ctk.CTkButton(master=barra,image= google, text="", width=30, height= 16, command=lambda: abrir_google(self.root))
+        boton8.place(relx=0.332, rely=0.25, anchor=ctk.CENTER)
 
         listen_thread = threading.Thread(target=ReconocimientoVoz, args=(self.root,))
         listen_thread.start()

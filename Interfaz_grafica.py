@@ -4,7 +4,8 @@ import os
 from PIL import Image, ImageTk
 import speech_recognition as sr
 import conexion as base
-import reproductor as musica
+import prueba as musica
+import inicio as inicio
 import mysql.connector 
 import editor as Appeditor
 import visorImagenes as visor
@@ -99,7 +100,7 @@ class Login:
                         self.info_login = ctk.CTkLabel(self.root, text="Login correcto")
                         self.info_login.pack(pady=10)
                         self.root.destroy()
-                        ventana_principal = VentanaPrincipal()
+                        ventana_principal = VentanaPrincipal(user)
                     else:
                         self.info_login.configure(text="Usuario o contraseña incorrectos")
                 else:
@@ -109,7 +110,7 @@ class Login:
 
 # Class para la ventana principal
 class VentanaPrincipal:
-    def __init__(self):
+    def __init__(self, user):
         self.root = ctk.CTk()
         self.root.title("Supra Os")
         self.root.attributes('-fullscreen', True)
@@ -135,7 +136,7 @@ class VentanaPrincipal:
         video = ctk.CTkImage(Image.open(os.path.join("Imagenes", "video.png")),size=(38,38))
         carpeta = ctk.CTkImage(Image.open(os.path.join("Imagenes", "carpetas.png")),size=(38,38))
 
-        boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16)
+        boton1 = ctk.CTkButton( master=barra, image=dx, text="", width=30, height= 16, command=lambda: inicio.init(self.root, user))
         boton1.place(relx=0.03, rely=0.25, anchor=ctk.CENTER)
         boton2 = ctk.CTkButton(master=barra,image= music, text="", width=30, height= 16, command = lambda: musica.init(self.root))
         boton2.place(relx=0.074, rely=0.25, anchor=ctk.CENTER)
@@ -147,7 +148,7 @@ class VentanaPrincipal:
         boton5.place(relx=0.203, rely=0.25, anchor=ctk.CENTER)
         boton6 = ctk.CTkButton(master=barra,image= video, text="", width=30, height= 16, command=lambda: visorvideo.init(self.root))
         boton6.place(relx=0.246, rely=0.25, anchor=ctk.CENTER)
-        boton7 = ctk.CTkButton(master=barra,image= carpeta, text="", width=30, height= 16, command=lambda: filemanager.init())
+        boton7 = ctk.CTkButton(master=barra,image= carpeta, text="", width=30, height= 16, command=lambda: filemanager.init(user))
         boton7.place(relx=0.289, rely=0.25, anchor=ctk.CENTER)
 
         listen_thread = threading.Thread(target=ReconocimientoVoz, args=(self.root,))

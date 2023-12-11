@@ -74,6 +74,7 @@ class VisorDeVideo:
 
 def init(principal):
     root = ctk.CTkToplevel(master=principal)
+    root.title("Visor de videos")
     root.attributes('-topmost', 1)
     viewer = VisorDeVideo(root)
     principal.mainloop()

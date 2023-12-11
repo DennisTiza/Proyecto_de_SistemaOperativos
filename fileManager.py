@@ -5,7 +5,7 @@ from components.folder import Folder
 from components.aside import Aside
 from components.home import Home
 
-class FileManager(CTk):
+class FileManager(CTkToplevel):
     def __init__(self, current_dir=os.getcwd()):
         super().__init__()
         self.current_dir = current_dir
@@ -15,6 +15,7 @@ class FileManager(CTk):
 
     def configure(self):
         self.title('File Manager')
+        self.attributes('-topmost', 1)
         set_appearance_mode('System')
         set_default_color_theme("blue")
         self.minsize(1000, 500)
@@ -38,8 +39,7 @@ class FileManager(CTk):
         self.configure()
         self.mainloop()
 
-def init():
-    filemanger = FileManager()
-
-if __name__ == '__main__':
-    init()
+def init(user):
+    if user['rol'] == 'admin':
+        filemanger = FileManager("Usuarios")
+    filemanger = FileManager("Usuarios/"+str(user['id']))
